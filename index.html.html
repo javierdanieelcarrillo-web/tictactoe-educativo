@@ -1,0 +1,413 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TicTacToe Educativo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#030b08;--panel:#071a13;--text:#edfff2;--muted:#a5cbb1;
+  --neon:#39ff14;--green:#00ff91;--line:#17683c;
+  --x:#ff303f;--o:#168bff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  font-family:'Oxanium','Trebuchet MS',sans-serif;
+  background:radial-gradient(ellipse at center,#0b2b1a,var(--bg) 76%);
+  color:var(--text);display:flex;align-items:center;justify-content:center;padding:10px
+}
+button{
+  font:inherit;font-weight:600;color:var(--text);background:#06170f;
+  border:2px solid var(--neon);border-radius:11px;padding:10px 15px;
+  cursor:pointer;box-shadow:0 0 8px #39ff1460;transition:transform .18s,background .18s,box-shadow .18s
+}
+button:hover{background:#123b24;box-shadow:0 0 16px #39ff14;transform:translateY(-2px)}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.7;cursor:default;transform:none}
+.app{
+  position:relative;width:min(760px,100%);height:min(94dvh,800px);
+  min-height:0;overflow:auto;scrollbar-width:none;border:2px solid var(--neon);
+  border-radius:19px;background:#03110bf2;padding:clamp(12px,2.5vh,22px);
+  box-shadow:0 0 14px #39ff1480,0 0 35px #00ff8840;
+  display:flex;flex-direction:column;justify-content:center
+}
+.app::-webkit-scrollbar{display:none}
+.hidden{display:none!important}
+h1{text-align:center;color:var(--neon);font-size:clamp(27px,5vh,43px);margin:5px 0;text-shadow:0 0 13px #39ff14;letter-spacing:2px}
+h2{text-align:center;color:var(--green);font-size:clamp(19px,3vh,26px);margin:8px 0 14px}
+h3{text-align:center;font-size:16px;margin:15px 0 8px}
+p{color:var(--muted);line-height:1.5;font-size:14px}
+.center{text-align:center}
+.subtitle{color:var(--green);letter-spacing:3px;text-align:center;font-size:11px}
+.logo{width:clamp(125px,22vh,180px);height:clamp(105px,18.5vh,150px);display:block;margin:0 auto 5px;filter:drop-shadow(0 0 10px #39ff1488);animation:float 3s ease-in-out infinite}
+#home h1{font-size:clamp(36px,6.5vh,55px);letter-spacing:2.5px}
+#home .subtitle{font-size:14px;letter-spacing:4px;font-weight:800}
+#questionDifficulty{display:inline-flex;align-items:center;justify-content:center;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;background:linear-gradient(135deg,#174329,#168b38);color:#fff;border:1px solid #39ff14;box-shadow:0 0 12px #39ff1460}
+body.light #questionDifficulty{background:linear-gradient(135deg,#d9fbe2,#b5f2c4);color:#14532d;border-color:#168b38;box-shadow:0 0 8px #168b3830}
+#home{flex:1;min-height:0;display:flex;flex-direction:column}
+.home-content{margin:auto 0}
+#home .footer{margin-top:auto;padding-top:8px;flex-shrink:0}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 3px #39ff14)}50%{filter:drop-shadow(0 0 12px #39ff14)}}
+@keyframes sparkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.13) rotate(-5deg)}}
+.menu{display:grid;gap:10px;width:min(330px,100%);margin:17px auto}
+.menu button{font-size:clamp(14px,2.2vh,17px);padding:clamp(9px,1.7vh,14px)}
+.menu button:first-child{animation:pulse 3s infinite}
+.pink{border-color:var(--green);box-shadow:0 0 9px #00ff8855}
+.green{border-color:var(--neon)}
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:clamp(12px,2vh,18px)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.small{font-size:12px;padding:7px 10px}
+.row{display:flex;gap:9px;justify-content:center;align-items:center;flex-wrap:wrap}
+.row button{min-width:90px}
+.flag{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:800}
+.flag svg{width:25px;height:17px;display:block;flex-shrink:0}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;width:min(330px,75vw,38vh);margin:12px auto}
+.cell{
+  aspect-ratio:1;font-family:'Oxanium',sans-serif;font-size:clamp(38px,8vh,60px);
+  font-weight:800;padding:0;border:2px solid #197b45;background:#04170e;
+  box-shadow:inset 0 0 12px #39ff1410
+}
+.cell.x{color:var(--x)!important;text-shadow:0 0 12px #ff303f99!important}
+.cell.o{color:var(--o)!important;text-shadow:0 0 12px #168bff99!important}
+.cell.correct{background:#164c28!important;border-color:var(--neon)!important;box-shadow:0 0 22px var(--neon)!important}
+.score{display:flex;justify-content:center;gap:25px;font-size:17px;margin:8px}
+.scoreX{color:var(--x)}.scoreO{color:var(--o)}
+.turn-badge{color:var(--green);font-weight:700;text-shadow:0 0 8px #39ff1466}
+.footer{text-align:center;font-size:10px;color:#679578;margin-top:8px;letter-spacing:.5px}
+.question{font-size:clamp(16px,2.7vh,21px);color:var(--text);text-align:center;margin:12px 0}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.answers button{font-size:14px;min-height:45px;padding:8px}
+.answers button.right{background:#174b28;border-color:var(--neon)}
+.answers button.wrong{background:#401b2b;border-color:#ff5470}
+.feedback{text-align:center;min-height:22px;margin-top:8px;font-size:14px;color:var(--green)}
+/* Ventanas flotantes centradas */
+.overlay{
+  position:fixed;inset:0;z-index:20;background:#000a;backdrop-filter:blur(5px);
+  display:flex;align-items:center;justify-content:center;padding:15px
+}
+.modal{
+  width:min(510px,100%);max-height:85dvh;overflow:auto;scrollbar-width:thin;
+  background:#06170ff7;border:2px solid var(--neon);border-radius:17px;
+  padding:clamp(14px,2.5vh,22px);box-shadow:0 0 22px #39ff1477,0 0 50px #0008;
+  animation:pop .2s ease-out
+}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal .topbar{margin-bottom:8px}
+.modal .topbar h2{margin:4px 0}
+.close-arrow{font-size:19px;min-width:42px;padding:5px 10px}
+.modal p{font-size:14px}
+.modal .answers button{min-height:48px}
+.modal .question{margin:15px 0}
+.modal .row{margin-top:12px}
+body.light{
+  --bg:#edf8ef;--panel:#fff;--text:#182c20;--muted:#405b49;--line:#9bcaa9;
+  background:radial-gradient(ellipse at center,#d6f2dc,#f1fff3 75%)
+}
+body.light .app{background:#f8fffaf5;border-color:#168b38;box-shadow:0 0 14px #2dbb4a55}
+body.light h1{color:#168b38;text-shadow:0 0 8px #39ff1466}
+body.light button{background:#f3fff5;color:#173a22;border-color:#168b38;box-shadow:0 0 7px #168b3825}
+body.light button:hover{background:#dff8e4;box-shadow:0 0 13px #168b3866}
+body.light .cell{background:#f4fff6;border-color:#8bc79a}
+body.light .cell.x{color:#d71932!important;text-shadow:0 0 5px #d7193244!important}
+body.light .cell.o{color:#075fc7!important;text-shadow:0 0 5px #075fc744!important}
+body.light .turn-badge{color:#147b32}
+body.light .modal{background:#f8fffdf7;border-color:#168b38}
+body.light .modal .question{color:#182c20}
+body.light .modal button{background:#f3fff5;color:#173a22}
+body.light .answers button.right{background:#d8ffe2;border-color:#168b38}
+body.light .answers button.wrong{background:#ffe2e7;border-color:#d71932}
+body.light .footer{color:#557c61}
+@media(max-height:650px){
+ .app{height:98dvh;padding:8px}
+ .logo{width:88px;height:74px}
+ h1{font-size:28px}
+ #home h1{font-size:clamp(32px,5.8vh,44px)}
+ .menu{gap:6px;margin:8px auto}
+ .menu button{padding:7px}
+ .board{width:min(245px,34vh);gap:5px;margin:7px auto}
+ .cell{font-size:38px}
+ .panel{padding:9px}
+ .question{margin:7px 0}
+ .answers button{min-height:35px;padding:5px}
+}
+@media(max-width:420px){
+ .answers{grid-template-columns:1fr;gap:6px}
+ .modal .answers button{min-height:37px}
+ .board{width:min(260px,60vw,34vh)}
+ .footer{font-size:9px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<section id="home">
+<div class="home-content">
+<svg class="logo" viewBox="0 0 160 125" role="img" aria-label="Control y libro educativos">
+ <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#39ff14"/><stop offset="1" stop-color="#00ffb3"/></linearGradient></defs>
+ <path d="M25 16 Q80 3 135 16 L135 105 Q80 91 25 105 Z" fill="#06170e" stroke="url(#g)" stroke-width="3"/>
+ <path d="M80 28 Q53 17 35 27 L35 84 Q59 76 80 91 Z" fill="#092519" stroke="#39ff14" stroke-width="2"/>
+ <path d="M80 28 Q107 17 125 27 L125 84 Q101 76 80 91 Z" fill="#092519" stroke="#39ff14" stroke-width="2"/>
+ <path d="M44 39 L65 39 M44 49 L65 49 M44 59 L65 59 M95 39 L116 39 M95 49 L116 49 M95 59 L116 59" stroke="#39ff14" stroke-width="2" stroke-linecap="round"/>
+ <g transform="translate(39 67)">
+  <path d="M9 2 H28 L36 10 H57 Q67 10 70 22 L74 36 Q75 44 67 44 H54 L45 34 H20 L11 44 H-1 Q-8 43 -5 33 L-1 17 Q1 7 9 2Z" fill="#07170f" stroke="#39ff14" stroke-width="3"/>
+  <path d="M12 16 V30 M5 23 H19" stroke="#39ff14" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="54" cy="20" r="3" fill="#39ff14"/><circle cx="63" cy="28" r="3" fill="#00ffb3"/>
+ </g>
+</svg>
+<h1>TIC-TAC-TOE</h1>
+<div class="subtitle">EDUCATIVO</div>
+<p class="center" data-es="🎮 ¡Responde correctamente y conquista el tablero! 📚" data-en="🎮 Answer correctly and conquer the board! 📚">🎮 ¡Responde correctamente y conquista el tablero! 📚</p>
+<div class="menu" id="mainMenu">
+<button onclick="showDifficulty()" data-es="✨ JUGAR" data-en="✨ PLAY">✨ JUGAR</button>
+<button class="pink" onclick="openPanel('settings')" data-es="⚙️ CONFIGURACIONES" data-en="⚙️ SETTINGS">⚙️ CONFIGURACIONES</button>
+<button onclick="openPanel('rules')" data-es="📜 REGLAS" data-en="📜 RULES">📜 REGLAS</button>
+<button class="pink" onclick="openPanel('instructions')" data-es="💡 INSTRUCCIONES" data-en="💡 INSTRUCTIONS">💡 INSTRUCCIONES</button>
+</div>
+</div>
+<footer class="footer">© 2026 TicTacToe Educativo · Todos los derechos reservados</footer>
+</section>
+
+<section id="game" class="hidden">
+<div class="topbar">
+<button class="small" onclick="backHome()">🏠 <span data-es="Inicio" data-en="Home">Inicio</span></button>
+<span id="levelLabel"></span>
+<button class="small" onclick="openGameSettings()">⚙️</button>
+</div>
+<h1>TIC-TAC-TOE</h1>
+<div class="score"><span class="scoreX">❌ X: <b id="scoreX">0</b></span><span class="scoreO">🔵 O: <b id="scoreO">0</b></span></div>
+<p class="center turn-badge" id="turnLabel"></p>
+<div class="board" id="board"></div>
+<div class="row"><button onclick="newRound()" data-es="🔄 Nueva partida" data-en="🔄 New game">🔄 Nueva partida</button></div>
+</section>
+
+<!-- Las ventanas son overlays centrados, no contenido debajo del tablero -->
+<div id="settingsOverlay" class="overlay hidden" onclick="outsideClose(event,'settingsOverlay')">
+ <div class="modal" role="dialog" aria-modal="true">
+  <div class="topbar"><h2 data-es="⚙️ Configuraciones" data-en="⚙️ Settings">⚙️ Configuraciones</h2><button class="close-arrow" onclick="closeOverlay('settingsOverlay')" aria-label="Cerrar">↩</button></div>
+  <h3 data-es="🌐 Idioma" data-en="🌐 Language">🌐 Idioma</h3>
+  <div class="row">
+   <button id="esBtn" onclick="setLanguage('es')"><span class="flag"><svg viewBox="0 0 60 36" role="img" aria-label="Bandera de España"><rect width="60" height="36" fill="#c60b1e"/><rect y="9" width="60" height="18" fill="#ffc400"/><rect x="12" y="13" width="5" height="10" rx="1" fill="#aa151b"/><rect x="18" y="15" width="3" height="6" fill="#aa151b"/></svg> ESP</span></button>
+   <button id="enBtn" onclick="setLanguage('en')"><span class="flag"><svg viewBox="0 0 60 36" role="img" aria-label="Bandera de Inglaterra"><rect width="60" height="36" fill="#fff"/><rect x="24" width="12" height="36" fill="#c8102e"/><rect y="12" width="60" height="12" fill="#c8102e"/></svg> ENG</span></button>
+  </div>
+  <h3 data-es="🎨 Tema" data-en="🎨 Theme">🎨 Tema</h3>
+  <div class="row"><button onclick="setTheme('dark')" data-es="🌙 Oscuro" data-en="🌙 Dark">🌙 Oscuro</button><button onclick="setTheme('light')" data-es="☀️ Claro" data-en="☀️ Light">☀️ Claro</button></div>
+  <div class="row"><button onclick="closeOverlay('settingsOverlay')" data-es="✓ Listo" data-en="✓ Done">✓ Listo</button></div>
+ </div>
+</div>
+
+<div id="questionOverlay" class="overlay hidden">
+ <div class="modal" role="dialog" aria-modal="true">
+  <div class="topbar"><h2 data-es="🧠 ¡Pregunta!" data-en="🧠 Question!">🧠 ¡Pregunta!</h2><span id="questionDifficulty"></span></div>
+  <div class="question" id="questionText"></div>
+  <div class="answers" id="answerButtons"></div>
+  <div class="feedback" id="feedback"></div>
+ </div>
+</div>
+
+<div id="resultOverlay" class="overlay hidden">
+ <div class="modal center" role="dialog" aria-modal="true">
+  <h2 id="resultTitle"></h2><p id="resultText"></p>
+  <div class="row"><button onclick="newRound()" data-es="🎮 Jugar otra vez" data-en="🎮 Play again">🎮 Jugar otra vez</button><button class="pink" onclick="backHome()" data-es="🏠 Inicio" data-en="🏠 Home">🏠 Inicio</button></div>
+ </div>
+</div>
+
+<div id="infoOverlay" class="overlay hidden" onclick="outsideClose(event,'infoOverlay')">
+ <div class="modal" role="dialog" aria-modal="true">
+  <div class="topbar"><h2 id="infoTitle"></h2><button class="close-arrow" onclick="closeOverlay('infoOverlay')" aria-label="Cerrar">↩</button></div>
+  <p id="infoText"></p>
+ </div>
+</div>
+
+<div id="difficultyOverlay" class="overlay hidden" onclick="outsideClose(event,'difficultyOverlay')">
+ <div class="modal">
+  <div class="topbar"><h2 data-es="🎯 Elige dificultad" data-en="🎯 Choose difficulty">🎯 Elige dificultad</h2><button class="close-arrow" onclick="closeOverlay('difficultyOverlay')" aria-label="Cerrar">↩</button></div>
+  <div class="menu">
+   <button onclick="startGame('facil')" data-es="🟢 FÁCIL" data-en="🟢 EASY">🟢 FÁCIL</button>
+   <button onclick="startGame('medio')" data-es="🟡 MEDIO" data-en="🟡 MEDIUM">🟡 MEDIO</button>
+   <button class="pink" onclick="startGame('dificil')" data-es="🔴 DIFÍCIL" data-en="🔴 HARD">🔴 DIFÍCIL</button>
+  </div>
+  <p class="center" data-es="Elige el reto que quieras afrontar." data-en="Choose the challenge you want to take on.">Elige el reto que quieras afrontar.</p>
+ </div>
+</div>
+</main>
+
+<script>
+let lang='es',difficulty='facil',board=Array(9).fill(''),player='X';
+let scores={X:0,O:0},pendingCell=null,locked=false,used=new Set(),currentQuestion=null,gameOver=false,answerTimer=null;
+
+const Q=[
+[1,'¿Cuál es la capital de Colombia?','What is the capital of Colombia?','Bogotá','Medellín','Cali','Cartagena',0],
+[1,'¿Cuál es la moneda de Colombia?','What is Colombia’s currency?','Peso colombiano','Dólar','Euro','Real',0],
+[1,'¿Qué colores tiene la bandera de Colombia?','What colors are on Colombia’s flag?','Amarillo, azul y rojo','Verde y blanco','Azul y blanco','Rojo y negro',0],
+[1,'¿En qué continente está Colombia?','Which continent is Colombia in?','América del Sur','Europa','Asia','África',0],
+[1,'¿Qué plato es típico de Colombia?','Which dish is traditional in Colombia?','Bandeja paisa','Sushi','Croissant','Ramen',0],
+[1,'¿Qué ave aparece en el escudo de Colombia?','Which bird appears on Colombia’s coat of arms?','Cóndor de los Andes','Pingüino','Flamenco','Pavo real',0],
+[1,'¿Qué océano baña la costa occidental de Colombia?','Which ocean borders western Colombia?','Pacífico','Índico','Ártico','Antártico',0],
+[1,'¿En qué ciudad se celebra la Feria de las Flores?','Which city hosts the Flower Festival?','Medellín','Pasto','Tunja','Riohacha',0],
+[1,'¿Qué producto colombiano es famoso en el mundo?','Which Colombian product is famous worldwide?','Café','Jarabe de arce','Té matcha','Cacao ruso',0],
+[1,'¿Cuál es el satélite natural de la Tierra?','What is Earth’s natural satellite?','La Luna','El Sol','Marte','Venus',0],
+[1,'¿Qué planeta habitamos?','Which planet do we live on?','La Tierra','Júpiter','Marte','Venus',0],
+[1,'¿Qué instrumento tiene teclas blancas y negras?','Which instrument has black and white keys?','Piano','Violín','Trompeta','Tambor',0],
+[1,'¿Qué animal produce miel?','Which animal produces honey?','Abeja','Hormiga','Mosca','Mariposa',0],
+[1,'¿Qué idioma se habla principalmente en Brasil?','What is the main language spoken in Brazil?','Portugués','Español','Francés','Inglés',0],
+[1,'¿Qué órgano bombea la sangre?','Which organ pumps blood?','Corazón','Pulmón','Cerebro','Estómago',0],
+[1,'¿Qué deporte se juega con un balón y porterías?','Which sport uses a ball and goals?','Fútbol','Ajedrez','Natación','Gimnasia',0],
+[1,'¿Qué ciudad colombiana está en la costa Caribe?','Which Colombian city is on the Caribbean coast?','Cartagena','Pasto','Ibagué','Tunja',0],
+[1,'¿Qué necesitan las plantas para crecer?','What do plants need to grow?','Agua y luz','Plástico','Humo','Vidrio',0],
+[1,'¿Qué sentido usamos para escuchar?','Which sense do we use to hear?','Oído','Vista','Gusto','Olfato',0],
+[1,'¿Cuál es el principal idioma de Brasil?','What is Brazil’s main language?','Portugués','Español','Inglés','Francés',0],
+[2,'¿Quién escribió Cien años de soledad?','Who wrote One Hundred Years of Solitude?','Gabriel García Márquez','Jorge Luis Borges','Pablo Neruda','Mario Vargas Llosa',0],
+[2,'¿En qué año ocurrió el grito de independencia de Colombia?','In what year did Colombia’s independence uprising occur?','1810','1492','1910','1825',0],
+[2,'¿Cuál es la capital de Antioquia?','What is the capital of Antioquia?','Medellín','Manizales','Armenia','Bucaramanga',0],
+[2,'¿En qué departamento está el Parque Tayrona?','In which department is Tayrona National Park?','Magdalena','Cundinamarca','Tolima','Caldas',0],
+[2,'¿Qué instrumento es representativo del vallenato?','Which instrument is characteristic of vallenato music?','Acordeón','Sitar','Balalaica','Arpa celta',0],
+[2,'¿Cuál es la capital del Valle del Cauca?','What is the capital of Valle del Cauca?','Cali','Popayán','Pereira','Neiva',0],
+[2,'¿Qué movimiento terrestre produce el día y la noche?','Which movement of Earth causes day and night?','Rotación','Traslación','Precesión','Vibración',0],
+[2,'¿Qué gas absorben las plantas durante la fotosíntesis?','Which gas do plants absorb during photosynthesis?','Dióxido de carbono','Helio','Hidrógeno','Neón',0],
+[2,'¿Cuál es el planeta más grande del sistema solar?','What is the largest planet in the Solar System?','Júpiter','Mercurio','Marte','Venus',0],
+[2,'¿Qué civilización construyó Machu Picchu?','Which civilization built Machu Picchu?','Inca','Romana','Egipcia','Fenicia',0],
+[2,'¿Qué capa de la atmósfera contiene la mayor parte del ozono?','Which atmospheric layer contains most ozone?','Estratosfera','Troposfera','Mesosfera','Exosfera',0],
+[2,'¿Qué pueblo indígena se asocia históricamente con la región de Bogotá?','Which Indigenous people are historically associated with the Bogotá region?','Muisca','Wayuu','Tikuna','Mapuche',0],
+[2,'¿Cuál es la capital de Japón?','What is the capital of Japan?','Tokio','Kioto','Osaka','Hiroshima',0],
+[2,'¿Qué gas es el más abundante en la atmósfera terrestre?','Which gas is most abundant in Earth’s atmosphere?','Nitrógeno','Oxígeno','Dióxido de carbono','Hidrógeno',0],
+[2,'¿Qué pintor creó La noche estrellada?','Which painter created The Starry Night?','Vincent van Gogh','Pablo Picasso','Claude Monet','Salvador Dalí',0],
+[2,'¿Qué instrumento mide la presión atmosférica?','Which instrument measures atmospheric pressure?','Barómetro','Termómetro','Higrómetro','Anemómetro',0],
+[2,'¿Qué país tiene como capital a Lisboa?','Which country has Lisbon as its capital?','Portugal','Italia','Grecia','Austria',0],
+[2,'¿Qué órgano filtra la sangre y produce orina?','Which organ filters blood and produces urine?','Riñón','Pulmón','Páncreas','Bazo',0],
+[3,'¿Cuál es el pico más alto de Colombia?','What is Colombia’s highest peak?','Pico Cristóbal Colón','Nevado del Ruiz','Puracé','Nevado del Tolima',0],
+[3,'¿Qué nombre recibió el territorio de Colombia, Venezuela, Ecuador y Panamá tras la independencia?','What was the territory of Colombia, Venezuela, Ecuador and Panama called after independence?','Gran Colombia','Virreinato del Perú','Confederación Andina','Provincias Unidas de Centroamérica',0],
+[3,'¿Qué proceso explica principalmente la formación de los Andes?','Which process mainly explains the formation of the Andes?','Convergencia de placas tectónicas','Erosión del viento únicamente','Impactos de meteoritos','Congelación oceánica',0],
+[3,'¿Qué tratado puso fin formalmente a la guerra entre Alemania y los Aliados en 1919?','Which treaty formally ended the war between Germany and the Allies in 1919?','Tratado de Versalles','Tratado de Tordesillas','Tratado de Utrecht','Tratado de Roma',0],
+[3,'¿Qué filósofo escribió La República?','Which philosopher wrote The Republic?','Platón','Aristóteles','Epicuro','Heráclito',0],
+[3,'¿Qué fenómeno hace que la luz cambie de dirección al pasar entre medios?','Which phenomenon makes light change direction between media?','Refracción','Combustión','Evaporación','Fermentación',0],
+[3,'¿Qué acuerdo internacional de 2015 busca limitar el calentamiento global?','Which 2015 international agreement aims to limit global warming?','Acuerdo de París','Tratado de Utrecht','Tratado Antártico','Tratado de Roma',0],
+[3,'¿Qué institución publica el Índice de Desarrollo Humano?','Which institution publishes the Human Development Index?','Programa de las Naciones Unidas para el Desarrollo','Organización Mundial del Comercio','Fondo Monetario Internacional','Banco Mundial únicamente',0],
+[3,'¿Qué rama de la filosofía estudia el conocimiento?','Which branch of philosophy studies knowledge?','Epistemología','Estética','Ética aplicada','Retórica',0],
+[3,'¿Qué estructura contiene la mayor parte del ADN de una célula eucariota?','Which structure contains most DNA in a eukaryotic cell?','Núcleo','Ribosoma','Membrana celular','Aparato de Golgi',0],
+[3,'¿Qué fenómeno climático se relaciona con el calentamiento del Pacífico ecuatorial?','Which climate phenomenon is linked to warming of the equatorial Pacific?','El Niño','Corriente de Labrador','Monzón indio','Aurora boreal',0],
+[3,'¿Qué científico formuló las leyes del movimiento y la gravitación universal?','Which scientist formulated the laws of motion and universal gravitation?','Isaac Newton','Louis Pasteur','Charles Darwin','Niels Bohr',0],
+[3,'¿Qué concepto económico describe el aumento general de precios?','Which economic concept describes a general increase in prices?','Inflación','Deflación','Productividad','Recesión técnica',0],
+[3,'¿Qué órgano de la ONU tiene responsabilidad principal por la paz y seguridad internacionales?','Which UN body has primary responsibility for international peace and security?','Consejo de Seguridad','Secretaría de Turismo','Consejo Económico y Social','Corte Internacional de Justicia',0],
+[3,'¿Qué principio establece que la energía no se crea ni se destruye?','Which principle states that energy cannot be created or destroyed?','Conservación de la energía','Selección natural','Principio de incertidumbre','Segregación genética',0],
+[3,'¿Qué documento de 1789 proclamó derechos durante la Revolución francesa?','Which 1789 document proclaimed rights during the French Revolution?','Declaración de los Derechos del Hombre y del Ciudadano','Carta Magna','Edicto de Milán','Tratado de Tordesillas',0]
+];
+
+const answerTranslations={'Bogotá': 'Bogotá', 'Medellín': 'Medellín', 'Cali': 'Cali', 'Cartagena': 'Cartagena', 'Peso colombiano': 'Colombian peso', 'Dólar': 'Dollar', 'Euro': 'Euro', 'Real': 'Real', 'Amarillo, azul y rojo': 'Yellow, blue and red', 'Verde y blanco': 'Green and white', 'Azul y blanco': 'Blue and white', 'Rojo y negro': 'Red and black', 'América del Sur': 'South America', 'Europa': 'Europe', 'Asia': 'Asia', 'África': 'Africa', 'Bandeja paisa': 'Bandeja paisa', 'Sushi': 'Sushi', 'Croissant': 'Croissant', 'Ramen': 'Ramen', 'Cóndor de los Andes': 'Andean condor', 'Pingüino': 'Penguin', 'Flamenco': 'Flamingo', 'Pavo real': 'Peacock', 'Pacífico': 'Pacific Ocean', 'Índico': 'Indian Ocean', 'Ártico': 'Arctic Ocean', 'Antártico': 'Antarctic Ocean', 'Pasto': 'Pasto', 'Tunja': 'Tunja', 'Riohacha': 'Riohacha', 'Café': 'Coffee', 'Jarabe de arce': 'Maple syrup', 'Té matcha': 'Matcha tea', 'Cacao ruso': 'Russian cocoa', 'La Luna': 'The Moon', 'El Sol': 'The Sun', 'Marte': 'Mars', 'Venus': 'Venus', 'La Tierra': 'Earth', 'Júpiter': 'Jupiter', 'Piano': 'Piano', 'Violín': 'Violin', 'Trompeta': 'Trumpet', 'Tambor': 'Drum', 'Abeja': 'Bee', 'Hormiga': 'Ant', 'Mosca': 'Fly', 'Mariposa': 'Butterfly', 'Bucaramanga': 'Bucaramanga', 'Caldas': 'Caldas', 'Cundinamarca': 'Cundinamarca', 'Magdalena': 'Magdalena', 'Tolima': 'Tolima', 'Manizales': 'Manizales', 'Ibagué': 'Ibagué', 'Neiva': 'Neiva', 'Pereira': 'Pereira', 'Popayán': 'Popayán', 'Armenia': 'Armenia', 'Nevado del Ruiz': 'Nevado del Ruiz', 'Nevado del Tolima': 'Nevado del Tolima', 'Pico Cristóbal Colón': 'Pico Cristóbal Colón', 'Puracé': 'Puracé', '1492': '1492', '1810': '1810', '1825': '1825', '1910': '1910', 'Carta Magna': 'Magna Carta', 'Declaración de los Derechos del Hombre y del Ciudadano': 'Declaration of the Rights of Man and of the Citizen', 'Edicto de Milán': 'Edict of Milan', 'Tratado de Tordesillas': 'Treaty of Tordesillas', 'Tratado de Versalles': 'Treaty of Versailles', 'Tratado de Roma': 'Treaty of Rome', 'Tratado de Utrecht': 'Treaty of Utrecht', 'Tratado Antártico': 'Antarctic Treaty', 'Acuerdo de París': 'Paris Agreement', 'Consejo de Seguridad': 'Security Council', 'Consejo Económico y Social': 'Economic and Social Council', 'Corte Internacional de Justicia': 'International Court of Justice', 'Secretaría de Turismo': 'Tourism Secretariat', 'Fondo Monetario Internacional': 'International Monetary Fund', 'Banco Mundial únicamente': 'World Bank only', 'Organización Mundial del Comercio': 'World Trade Organization', 'Programa de las Naciones Unidas para el Desarrollo': 'United Nations Development Programme', 'Inflación': 'Inflation', 'Deflación': 'Deflation', 'Productividad': 'Productivity', 'Recesión técnica': 'Technical recession', 'Conservación de la energía': 'Conservation of energy', 'Principio de incertidumbre': 'Uncertainty principle', 'Segregación genética': 'Genetic segregation', 'Selección natural': 'Natural selection', 'Convergencia de placas tectónicas': 'Convergence of tectonic plates', 'Erosión del viento únicamente': 'Wind erosion only', 'Congelación oceánica': 'Ocean freezing', 'Corriente de Labrador': 'Labrador Current', 'Monzón indio': 'Indian monsoon', 'El Niño': 'El Niño', 'Impactos de meteoritos': 'Meteorite impacts', 'Evaporación': 'Evaporation', 'Fermentación': 'Fermentation', 'Combustión': 'Combustion', 'Refracción': 'Refraction', 'Rotación': 'Rotation', 'Traslación': 'Revolution', 'Precesión': 'Precession', 'Vibración': 'Vibration', 'Vidrio': 'Glass', 'Plástico': 'Plastic', 'Agua y luz': 'Water and light', 'Humo': 'Smoke', 'Dióxido de carbono': 'Carbon dioxide', 'Oxígeno': 'Oxygen', 'Hidrógeno': 'Hydrogen', 'Nitrógeno': 'Nitrogen', 'Helio': 'Helium', 'Neón': 'Neon', 'Estratosfera': 'Stratosphere', 'Exosfera': 'Exosphere', 'Mesosfera': 'Mesosphere', 'Troposfera': 'Troposphere', 'Núcleo': 'Core', 'Membrana celular': 'Cell membrane', 'Aparato de Golgi': 'Golgi apparatus', 'Ribosoma': 'Ribosome', 'Cerebro': 'Brain', 'Corazón': 'Heart', 'Pulmón': 'Lung', 'Riñón': 'Kidney', 'Estómago': 'Stomach', 'Bazo': 'Spleen', 'Páncreas': 'Pancreas', 'Gusto': 'Taste', 'Olfato': 'Smell', 'Oído': 'Hearing', 'Vista': 'Sight', 'Ética aplicada': 'Applied ethics', 'Estética': 'Aesthetics', 'Epistemología': 'Epistemology', 'Retórica': 'Rhetoric', 'Francés': 'French', 'Inglés': 'English', 'Español': 'Spanish', 'Portugués': 'Portuguese', 'Egipcia': 'Egyptian', 'Fenicia': 'Phoenician', 'Inca': 'Inca', 'Muisca': 'Muisca', 'Mapuche': 'Mapuche', 'Tikuna': 'Tikuna', 'Wayuu': 'Wayuu', 'Romana': 'Roman', 'Gran Colombia': 'Gran Colombia', 'Confederación Andina': 'Andean Confederation', 'Provincias Unidas de Centroamérica': 'United Provinces of Central America', 'Virreinato del Perú': 'Viceroyalty of Peru', 'Grecia': 'Greece', 'Austria': 'Austria', 'Italia': 'Italy', 'Portugal': 'Portugal', 'Osaka': 'Osaka', 'Tokio': 'Tokyo', 'Kioto': 'Kyoto', 'Hiroshima': 'Hiroshima', 'Natación': 'Swimming', 'Gimnasia': 'Gymnastics', 'Fútbol': 'Football', 'Ajedrez': 'Chess', 'Acordeón': 'Accordion', 'Arpa celta': 'Celtic harp', 'Balalaica': 'Balalaika', 'Sitar': 'Sitar', 'Anemómetro': 'Anemometer', 'Barómetro': 'Barometer', 'Higrómetro': 'Hygrometer', 'Termómetro': 'Thermometer', 'Aurora boreal': 'Northern lights', 'Charles Darwin': 'Charles Darwin', 'Isaac Newton': 'Isaac Newton', 'Niels Bohr': 'Niels Bohr', 'Louis Pasteur': 'Louis Pasteur', 'Aristóteles': 'Aristotle', 'Platón': 'Plato', 'Epicuro': 'Epicurus', 'Heráclito': 'Heraclitus', 'Gabriel García Márquez': 'Gabriel García Márquez', 'Jorge Luis Borges': 'Jorge Luis Borges', 'Mario Vargas Llosa': 'Mario Vargas Llosa', 'Pablo Neruda': 'Pablo Neruda', 'Claude Monet': 'Claude Monet', 'Pablo Picasso': 'Pablo Picasso', 'Salvador Dalí': 'Salvador Dalí', 'Vincent van Gogh': 'Vincent van Gogh'};
+function answerText(value){return lang==='en'?(answerTranslations[value]||value):value;}
+
+function translate(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll('[data-es]').forEach(e=>e.textContent=e.getAttribute('data-'+lang));
+ const names={facil:['Fácil','Easy'],medio:['Medio','Medium'],dificil:['Difícil','Hard']};
+ document.getElementById('levelLabel').textContent=(lang==='es'?'Dificultad: ':'Difficulty: ')+names[difficulty][lang==='es'?0:1];
+ document.getElementById('turnLabel').textContent=lang==='es'?'Turno de '+player:"Player "+player+"'s turn";
+ const es=document.getElementById('esBtn'),en=document.getElementById('enBtn');
+ if(es)es.style.background=lang==='es'?'#174329':'';
+ if(en)en.style.background=lang==='en'?'#174329':'';
+ if(currentQuestion)renderQuestionText();
+}
+function setLanguage(l){lang=l;translate()}
+function setTheme(t){document.body.classList.toggle('light',t==='light')}
+function closeOverlay(id){document.getElementById(id).classList.add('hidden')}
+function outsideClose(e,id){if(e.target.id===id)closeOverlay(id)}
+function closeAllOverlays(){['settingsOverlay','questionOverlay','resultOverlay','infoOverlay','difficultyOverlay'].forEach(closeOverlay)}
+function openPanel(id){
+ const titles={
+ settings:['⚙️ Configuraciones','⚙️ Settings'],
+ rules:['📜 Reglas','📜 Rules'],
+ instructions:['💡 Instrucciones','💡 Instructions']
+ };
+ const content={
+ rules:[
+ 'Dos jugadores se turnan: X y O. Para marcar una casilla, hay que responder una pregunta. Si aciertas, colocas tu símbolo; si fallas, pierdes el turno. Gana quien consiga tres símbolos en línea. Si se llena el tablero sin ganador, hay empate.',
+ 'Two players take turns: X and O. Answer a question to mark a square. If correct, place your symbol; if wrong, you lose your turn. Get three symbols in a line to win. If the board fills with no winner, it is a draw.'
+ ],
+ instructions:[
+ 'Pulsa Jugar, elige una dificultad y selecciona una casilla vacía. Contesta la pregunta para intentar colocar tu símbolo. ¡Compite con el otro jugador!',
+ 'Press Play, choose a difficulty and select an empty square. Answer the question to try to place your symbol. Compete against the other player!'
+ ]
+ };
+ if(id==='settings'){document.getElementById('settingsOverlay').classList.remove('hidden');return}
+ document.getElementById('infoTitle').textContent=titles[id][lang==='es'?0:1];
+ document.getElementById('infoText').textContent=content[id][lang==='es'?0:1];
+ document.getElementById('infoOverlay').classList.remove('hidden');
+}
+function showDifficulty(){document.getElementById('difficultyOverlay').classList.remove('hidden')}
+function resetScores(){scores={X:0,O:0};updateScores()}
+function backHome(){
+ clearTimeout(answerTimer);closeAllOverlays();locked=false;pendingCell=null;currentQuestion=null;
+ document.getElementById('game').classList.add('hidden');
+ document.getElementById('home').classList.remove('hidden');
+ board=Array(9).fill('');player='X';gameOver=false;used.clear();resetScores();renderBoard();
+}
+function openGameSettings(){document.getElementById('settingsOverlay').classList.remove('hidden')}
+function startGame(d){
+ clearTimeout(answerTimer);difficulty=d;board=Array(9).fill('');player='X';gameOver=false;locked=false;pendingCell=null;used.clear();currentQuestion=null;resetScores();
+ closeAllOverlays();document.getElementById('home').classList.add('hidden');document.getElementById('game').classList.remove('hidden');renderBoard();translate();
+}
+function newRound(){startGame(difficulty)}
+function renderBoard(){
+ const el=document.getElementById('board');el.innerHTML='';
+ board.forEach((v,i)=>{
+  const b=document.createElement('button');b.className='cell'+(v==='X'?' x':v==='O'?' o':'');
+  b.textContent=v;b.disabled=!!v||gameOver||locked;b.onclick=()=>chooseCell(i);el.appendChild(b)
+ });
+ document.getElementById('turnLabel').textContent=lang==='es'?'Turno de '+player:"Player "+player+"'s turn";
+}
+function chooseCell(i){if(board[i]||gameOver||locked)return;pendingCell=i;locked=true;renderBoard();askQuestion()}
+function getQuestion(){
+ const chance={facil:.20,medio:.50,dificil:.90}[difficulty];
+ const wantsHard=Math.random()<chance;
+ const target=wantsHard?3:(difficulty==='facil'?1:2);
+ let available=Q.map((q,i)=>({q,i})).filter(o=>o.q[0]===target&&!used.has(o.i));
+ if(!available.length)available=Q.map((q,i)=>({q,i})).filter(o=>!used.has(o.i));
+ if(!available.length){used.clear();available=Q.map((q,i)=>({q,i})).filter(o=>o.q[0]===target)}
+ const picked=available[Math.floor(Math.random()*available.length)];used.add(picked.i);return picked.q;
+}
+function askQuestion(){
+ currentQuestion=getQuestion();document.getElementById('questionOverlay').classList.remove('hidden');document.getElementById('feedback').textContent='';renderQuestionText();
+ const opts=[currentQuestion[3],currentQuestion[4],currentQuestion[5],currentQuestion[6]].map((text,i)=>({text:answerText(text),i})).sort(()=>Math.random()-.5);
+ const el=document.getElementById('answerButtons');el.innerHTML='';
+ opts.forEach(o=>{const b=document.createElement('button');b.textContent=o.text;b.onclick=()=>answerQuestion(o.i===currentQuestion[7],b);el.appendChild(b)});
+}
+function renderQuestionText(){
+ document.getElementById('questionText').textContent=currentQuestion[lang==='es'?1:2];
+ document.getElementById('questionDifficulty').textContent=({1:lang==='es'?'Fácil':'Easy',2:lang==='es'?'Medio':'Medium',3:lang==='es'?'Difícil':'Hard'})[currentQuestion[0]];
+}
+function answerQuestion(correct,chosen){
+ if(!locked)return;locked=false;
+ [...document.getElementById('answerButtons').children].forEach(b=>b.disabled=true);
+ if(correct){
+  chosen.classList.add('right');document.getElementById('feedback').textContent=lang==='es'?'✨ ¡Correcto!':'✨ Correct!';
+  board[pendingCell]=player;renderBoard();
+  document.querySelectorAll('.cell')[pendingCell].classList.add('correct');
+ }else{
+  chosen.classList.add('wrong');document.getElementById('feedback').textContent=lang==='es'?'❌ Incorrecto. Pierdes el turno.':'❌ Incorrect. You lose your turn.';
+ }
+ /* La pregunta permanece visible durante 3 segundos después de responder */
+ answerTimer=setTimeout(()=>{
+  closeOverlay('questionOverlay');
+  if(correct&&checkWin(player)){gameOver=true;scores[player]++;updateScores();showResult(player)}
+  else if(board.every(Boolean)){gameOver=true;showResult('draw')}
+  else player=player==='X'?'O':'X';
+  pendingCell=null;currentQuestion=null;renderBoard();translate();
+ },3000);
+}
+function checkWin(p){
+ return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]].some(line=>line.every(i=>board[i]===p))
+}
+function updateScores(){document.getElementById('scoreX').textContent=scores.X;document.getElementById('scoreO').textContent=scores.O}
+function showResult(w){
+ document.getElementById('resultTitle').textContent=w==='draw'?(lang==='es'?'🤝 ¡Empate!':'🤝 It’s a draw!'):(lang==='es'?'🏆 ¡Gana '+w+'!':'🏆 Player '+w+' wins!');
+ document.getElementById('resultText').textContent=lang==='es'?`Puntuación: X ${scores.X} — O ${scores.O}`:`Score: X ${scores.X} — O ${scores.O}`;
+ document.getElementById('resultOverlay').classList.remove('hidden');
+}
+translate();
+</script>
+</body>
+</html>
