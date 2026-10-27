@@ -1,0 +1,12 @@
+{
+  "id": "/tictactoe-educativo/",
+  "name": "TicTacToe Educativo",
+  "short_name": "TicTacToe",
+  "description": "Juego educativo de tres en raya con preguntas para aprender mientras juegas.",
+  "lang": "es",
+  "start_url": "/tictactoe-educativo/",
+  "scope": "/tictactoe-educativo/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212"
+}
