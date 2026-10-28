@@ -1,8 +1,31 @@
-"icons": [
-  {
-    "src": "icons/icon-512.png",
-    "sizes": "512x512",
-    "type": "image/png",
-    "purpose": "any"
-  }
-]
+
+{
+  "id": "/tictactoe-educativo/",
+  "name": "TicTacToe Educativo",
+  "short_name": "TicTacToe",
+  "description": "TicTacToe Educativo es un juego de tres en raya que combina estrategia, cultura general y aprendizaje. Responde preguntas, elige la dificultad y compite con otro jugador para conseguir la victoria mientras aprendes de forma divertida.",
+  "start_url": "/tictactoe-educativo/",
+  "scope": "/tictactoe-educativo/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
+  "orientation": "any",
+  "dir": "ltr",
+  "lang": "es",
+  "background_color": "#121212",
+  "theme_color": "#39FF14",
+  "categories": [
+    "games",
+    "education"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
